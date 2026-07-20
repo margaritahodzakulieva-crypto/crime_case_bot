@@ -1,22 +1,24 @@
 import asyncio
-
 from aiogram import Bot,Dispatcher
-from aiogram.types import Message
-from aiogram.filters import Command
+
+from handlers import router
+
+from database.models import async_main
 
 
 BOT_TOKEN = '8864138811:AAEWIE5mgddDjMWhJo2EKAei24VrkQaWKCA'
 
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher()
-
-@dp.message(Command('start'))
-async def start(message: Message):
-    await message.answer(f'Hello!')
-
 
 async def main():
+    await async_main()
+    bot = Bot(token=BOT_TOKEN)
+    dp = Dispatcher()
+    dp.include_router(router)
     await dp.start_polling(bot)
 
+
 if __name__ == '__main__':
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
