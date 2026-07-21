@@ -229,6 +229,32 @@ async def crime_case_update(message: Message, state: FSMContext):
                          reply_markup=kb.admin_menu)
     await state.clear()
 
+@router.message(UpdateContent.title)
+async def process_title(message: Message, state: FSMContext):
+    await state.update_data(title=message.text.strip())
+    await state.set_state(UpdateContent.choose_field)
+    await message.answer('что будем менять')
+
+@router.message(UpdateContent.choose_field)
+async def process_field(message: Message, state: FSMContext):
+    await state.update_data(choose_field=message.text.strip())
+    await state.set_state(UpdateContent.waiting_for_value)
+    await message.answer('на что будем менять..')
+
+@router.message(UpdateContent.waiting_for_value)
+async def content_update(message: Message, state: FSMContext):
+    await state.update_data(waiting_for_value=message.text.strip())
+
+    content = await state.get_data()
+    await rq.update_content(
+        title=content['title'],
+        choose_field=content['choose_field'],
+        waiting_for_value=content['waiting_for_value'],
+    )
+
+    await message.answer('этот контент изменен',
+                         reply_markup=kb.admin_menu)
+    await state.clear()
 
 
 # МЕНЮ ПОЛЬЗОВАТЕЛЯ

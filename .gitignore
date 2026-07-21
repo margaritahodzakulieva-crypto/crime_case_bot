@@ -1,3 +1,2 @@
-venv
-BOT_TOKEN
-ADMIN_ID
+.venv
+.env

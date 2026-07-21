@@ -1,9 +1,11 @@
+import os
+
 from database.models import User,CrimeCase,Content,Favorite
 from database.models import async_session
 from sqlalchemy import select
 
 
-ADMIN_ID = [1935020407]
+admin_id = os.getenv("ADMIN_ID")
 
 # СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ / ПРОВЕРКА АДМИНА
 async def set_user(tg_id,registration_day,username,firstname,lastname):
@@ -23,7 +25,7 @@ async def set_user(tg_id,registration_day,username,firstname,lastname):
             await session.commit()
 
 async def is_admin(user_id: int) -> bool:
-    return user_id in ADMIN_ID
+    return user_id in admin_id
 
 # CRIME CASE  (ДОБАВЛЕНИЕ / УДАЛЕНИЕ)
 async def append_crime_case(title,country,year,category,description):
@@ -68,7 +70,7 @@ async def update_crime_case(title,choose_field,waiting_for_value):
 
 
 
-# КОНТЕНТ (ДОБАВЛЕНИЕ / УДАЛЕНИЕ)
+# КОНТЕНТ (ДОБАВЛЕНИЕ / УДАЛЕНИЕ / ОБНОВЛЕНИЕ)
 async def append_content(content_type,title,author,link,case,description):
     async with async_session() as session:
         content = await session.scalar(select(Content).where((Content.title == title)&(Content.content_type == content_type)))
@@ -95,5 +97,22 @@ async def delete_content(title):
             await session.delete(content)
             await session.commit()
 
-
+async def update_content(title,choose_field,waiting_for_value):
+    async with async_session() as session:
+        content = await session.scalar(select(Content).where(Content.title == title))
+        if content is not None:
+            match choose_field:
+                case 'title':
+                    content.title = waiting_for_value
+                case 'content_type':
+                    content.content_type = waiting_for_value
+                case 'author':
+                    content.author = waiting_for_value
+                case 'link':
+                    content.link = waiting_for_value
+                case 'description':
+                    content.description = waiting_for_value
+                case 'case_id':
+                    content.case_id = waiting_for_value
+            await session.commit()
 
