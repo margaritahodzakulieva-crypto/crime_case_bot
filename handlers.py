@@ -8,7 +8,6 @@ from aiogram.types import Message, CallbackQuery
 from aiogram.filters import Command, CommandStart
 from states import AddCrimeCase, AddContent, DeleteCrimeCase, DeleteContent, UpdateCrimeCase, UpdateContent
 
-
 router = Router()
 
 # СТАРТ И ПАНЕЛЬ АДМИНЕСТРАТОРА
@@ -87,7 +86,8 @@ async def process_description(message: Message, state: FSMContext):
         description=crime_case['description'],
     )
 
-    await message.answer('все я запомнил про это дело')
+    await message.answer('все я запомнил про это дело',
+                         reply_markup=kb.admin_menu)
     await state.clear()
 
 # ДОБАВЛЕНИЕ КОНТЕНТА
@@ -135,7 +135,8 @@ async def content_case_id(message: Message, state: FSMContext):
         description=content['description'],
     )
 
-    await message.answer('хорошая находка')
+    await message.answer('хорошая находка',
+                         reply_markup=kb.admin_menu)
     await state.clear()
 
 
@@ -256,6 +257,65 @@ async def content_update(message: Message, state: FSMContext):
                          reply_markup=kb.admin_menu)
     await state.clear()
 
+# CRIME CASES И КОНТЕНТ
+@router.message(F.text =='crime case')
+async def show_crime_cases(message: Message):
+    await message.answer("⏳ Загружаю список дел...")
+
+    crime_list = await rq.get_crime_cases()
+
+    if not crime_list:
+        await message.answer("Пока нет ни одного дела.")
+        return
+
+    text = "📋 <b>Список криминальных дел:</b>\n\n"
+
+    for case in crime_list:
+        text += (
+            f"🔹 <b>ID:</b> {case[0]}\n"
+            f"📌 <b>Название:</b> {case[1]}\n"
+            f"🌍 <b>Страна:</b> {case[2]}\n"
+            f"📅 <b>Год:</b> {case[3]}\n"
+            f"📂 <b>Категория:</b> {case[4]}\n"
+            f"📝 <b>Описание:</b> {case[5][:300]}...\n"
+            f"{'─' * 30}\n\n"
+        )
+
+    if len(text) > 4000:
+        await message.answer("Слишком много дел. Покажу первые несколько.")
+        await message.answer(text[:4000], parse_mode="HTML")
+    else:
+        await message.answer(text, parse_mode="HTML")
+
+@router.message(F.text =='контент')
+async def show_crime_cases(message: Message):
+    await message.answer("⏳ Загружаю список контента...")
+
+    content_list = await rq.get_content()
+
+    if not content_list:
+        await message.answer("Пока нет ни одного контента.")
+        return
+
+    text = "📋 <b>Список криминального контента:</b>\n\n"
+
+    for content in content_list:
+        text += (
+            f"🔹 <b>ID:</b> {content[0]}\n"
+            f"📌 <b>Название:</b> {content[1]}\n"
+            f"🌍 <b>Тип контента:</b> {content[2]}\n"
+            f"📅 <b>Автор:</b> {content[3]}\n"
+            f"📂 <b>Ссылка:</b> {content[4]}\n"
+            f"📝 <b>Описание:</b> {content[5][:300]}...\n"
+            f"📂 <b>Crime case:</b> {content[6]}\n"
+            f"{'─' * 30}\n\n"
+        )
+
+    if len(text) > 4000:
+        await message.answer("Слишком много дел. Покажу первые несколько.")
+        await message.answer(text[:4000], parse_mode="HTML")
+    else:
+        await message.answer(text, parse_mode="HTML")
 
 # МЕНЮ ПОЛЬЗОВАТЕЛЯ
 @router.message(F.text == 'menu')

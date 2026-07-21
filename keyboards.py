@@ -4,6 +4,8 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 # МЕНЮ АДМИНА  (ДОБАВЛЕНИЕ / УДАЛЕНИЕ / ОБНОВИТЬ)
 admin_menu = ReplyKeyboardMarkup(
     keyboard=[
+        [KeyboardButton(text='crime case'),
+         KeyboardButton(text='контент')],
         [KeyboardButton(text='добавить')],
         [KeyboardButton(text='отредактировать'),
          KeyboardButton(text='удалить')]

@@ -1,11 +1,20 @@
 import os
 
+from dotenv import load_dotenv
+
 from database.models import User,CrimeCase,Content,Favorite
 from database.models import async_session
 from sqlalchemy import select
 
 
+load_dotenv()
+
 admin_id = os.getenv("ADMIN_ID")
+if admin_id:
+    admin_list = [int(x.strip()) for x in admin_id.split(",") if x.strip()]
+else:
+    admin_list = []
+
 
 # СОХРАНЕНИЕ ПОЛЬЗОВАТЕЛЯ / ПРОВЕРКА АДМИНА
 async def set_user(tg_id,registration_day,username,firstname,lastname):
@@ -25,9 +34,10 @@ async def set_user(tg_id,registration_day,username,firstname,lastname):
             await session.commit()
 
 async def is_admin(user_id: int) -> bool:
-    return user_id in admin_id
+    return user_id in admin_list
 
-# CRIME CASE  (ДОБАВЛЕНИЕ / УДАЛЕНИЕ)
+
+# CRIME CASE  (ДОБАВЛЕНИЕ / УДАЛЕНИЕ / ОБНОВИТЬ)
 async def append_crime_case(title,country,year,category,description):
     async with async_session() as session:
         crime_case = await session.scalar(select(CrimeCase).where(CrimeCase.title == title))
@@ -67,7 +77,6 @@ async def update_crime_case(title,choose_field,waiting_for_value):
                 case 'description':
                     crime_case.description = waiting_for_value
             await session.commit()
-
 
 
 # КОНТЕНТ (ДОБАВЛЕНИЕ / УДАЛЕНИЕ / ОБНОВЛЕНИЕ)
@@ -116,3 +125,24 @@ async def update_content(title,choose_field,waiting_for_value):
                     content.case_id = waiting_for_value
             await session.commit()
 
+# КОНТЕНТ И CRIME CASES
+async def get_crime_cases():
+    async with async_session() as session:
+        result = await session.scalars(select(CrimeCase))
+        crime_cases = result.all()
+        crime_list = []
+        for crime in crime_cases:
+            crime_list.append([crime.id,crime.title,crime.country,crime.year,crime.category,crime.description])
+
+        return crime_list
+
+async def get_content():
+    async with async_session() as session:
+        result = await session.scalars(select(Content))
+        contents = result.all()
+        content_list = []
+        for content in contents:
+            crime = await session.scalar(select(CrimeCase.id).where(CrimeCase.id == content.case_id))
+            content_list.append([content.id,content.title,content.content_type,content.author,content.link,content.description,crime])
+
+        return content_list
