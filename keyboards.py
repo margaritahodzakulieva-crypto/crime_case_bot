@@ -4,11 +4,12 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMar
 # МЕНЮ АДМИНА  (ДОБАВЛЕНИЕ / УДАЛЕНИЕ / ОБНОВИТЬ)
 admin_menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='crime case'),
-         KeyboardButton(text='контент')],
-        [KeyboardButton(text='добавить')],
-        [KeyboardButton(text='отредактировать'),
-         KeyboardButton(text='удалить')]
+        [KeyboardButton(text='Crime Case📂'),
+         KeyboardButton(text='Контент🎬')],
+        [],
+        [KeyboardButton(text='Добавить➕')],
+        [KeyboardButton(text='Отредактировать📝'),
+         KeyboardButton(text='Удалить➖')]
     ],
     resize_keyboard=True,
     input_field_placeholder='tup button'
@@ -41,13 +42,20 @@ update_catalog = InlineKeyboardMarkup(
     ]
 )
 
+go_back_admin = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text="Вернуться🔙")]
+    ],
+    resize_keyboard=True
+)
 
 # МЕНЮ ПОЛЬЗОВАТЕЛЯ
 menu = ReplyKeyboardMarkup(
     keyboard=[
-        [KeyboardButton(text='menu')],
-        [KeyboardButton(text='back'),
-         KeyboardButton(text='contacts')]
+        [KeyboardButton(text='🔍 Найти дело'),
+         KeyboardButton(text='📖 История дня')],
+        [KeyboardButton(text='📚 Что посмотреть'),
+         KeyboardButton(text='⭐ Избранное')]
     ],
     resize_keyboard=True,
     input_field_placeholder='tup button'
@@ -60,4 +68,9 @@ catalog = InlineKeyboardMarkup(
             InlineKeyboardButton(text="Back", callback_data='crime_back'),
         ]
     ]
+)
+
+cancel_kb = ReplyKeyboardMarkup(
+    keyboard=[[KeyboardButton(text="Отмена")]],
+    resize_keyboard=True
 )

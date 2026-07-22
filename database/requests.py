@@ -146,3 +146,13 @@ async def get_content():
             content_list.append([content.id,content.title,content.content_type,content.author,content.link,content.description,crime])
 
         return content_list
+
+# ПОИСК
+async def get_crime_case_by_title(title: str):
+    async with async_session() as session:
+        result = await session.scalar(
+            select(CrimeCase).where(
+                CrimeCase.title.ilike(f"%{title}%")  # частичное совпадение
+            ).limit(5)
+        )
+        return result

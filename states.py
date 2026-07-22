@@ -33,3 +33,7 @@ class UpdateContent(StatesGroup):
     title = State()
     choose_field = State()
     waiting_for_value = State()
+
+# ПОИСК
+class FoundCrimeCase(StatesGroup):
+    title = State()
